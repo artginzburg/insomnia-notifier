@@ -1,11 +1,9 @@
 {
-	"required": true,
-	"package": "art.ginzburg.insomnianotifier.mixin.client",
-	"compatibilityLevel": "JAVA_21",
-	"client": [
-		"ExampleClientMixin"
-	],
-	"injectors": {
-		"defaultRequire": 1
-	}
+  "required": true,
+  "package": "art.ginzburg.insomnianotifier.mixin.client",
+  "compatibilityLevel": "JAVA_21",
+  "client": ["PlayerMixin"],
+  "injectors": {
+    "defaultRequire": 1
+  }
 }
