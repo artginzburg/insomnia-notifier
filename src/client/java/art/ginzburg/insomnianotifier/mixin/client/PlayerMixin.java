@@ -45,8 +45,6 @@ public class PlayerMixin {
       return;
     }
 
-    System.out.println("Time since rest: " + tracker.getTimeSinceRest());
-
     boolean isDeadOrDying = player.isDeadOrDying();
     if (isDeadOrDying && !wasDead) {
       wasDead = true;
@@ -64,8 +62,6 @@ public class PlayerMixin {
 
     int serverProvidedTimeSinceRest = player.getStats().getValue(Stats.CUSTOM.get(Stats.TIME_SINCE_REST));
     if (serverProvidedTimeSinceRest != 0 && tracker.lastServerKnownTimeSinceRest != serverProvidedTimeSinceRest) {
-      System.out.println("Synced time since rest with server! Time: " +
-          serverProvidedTimeSinceRest);
       tracker.lastServerKnownTimeSinceRest = serverProvidedTimeSinceRest;
       tracker.setTimeSinceRest(serverProvidedTimeSinceRest);
     }

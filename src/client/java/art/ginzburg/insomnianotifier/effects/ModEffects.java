@@ -1,5 +1,6 @@
 package art.ginzburg.insomnianotifier.effects;
 
+import art.ginzburg.insomnianotifier.InsomniaNotifier;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -16,7 +17,7 @@ public class ModEffects {
 
   private static Holder<MobEffect> register(String id, MobEffect statusEffect) {
     return Registry.registerForHolder(BuiltInRegistries.MOB_EFFECT,
-        ResourceLocation.fromNamespaceAndPath("insomnia-notifier", id),
+        ResourceLocation.fromNamespaceAndPath(InsomniaNotifier.MOD_ID, id),
         statusEffect);
   }
 }

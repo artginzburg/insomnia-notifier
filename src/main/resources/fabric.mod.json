@@ -1,41 +1,32 @@
 {
-	"schemaVersion": 1,
-	"id": "insomnia-notifier",
-	"version": "${version}",
-	"name": "Insomnia Notifier",
-	"description": "This is an example description! Tell everyone what your mod is about!",
-	"authors": [
-		"Me!"
-	],
-	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
-	},
-	"license": "CC0-1.0",
-	"icon": "assets/insomnia-notifier/icon.png",
-	"environment": "*",
-	"entrypoints": {
-		"main": [
-			"art.ginzburg.insomnianotifier.InsomniaNotifier"
-		],
-		"client": [
-			"art.ginzburg.insomnianotifier.InsomniaNotifierClient"
-		]
-	},
-	"mixins": [
-		"insomnia-notifier.mixins.json",
-		{
-			"config": "insomnia-notifier.client.mixins.json",
-			"environment": "client"
-		}
-	],
-	"depends": {
-		"fabricloader": ">=0.16.13",
-		"minecraft": "~1.21.3",
-		"java": ">=21",
-		"fabric-api": "*"
-	},
-	"suggests": {
-		"another-mod": "*"
-	}
+  "schemaVersion": 1,
+  "id": "insomnia-notifier",
+  "version": "${version}",
+  "name": "Insomnia Notifier",
+  "description": "Informs you of potential phantoms (client-side!)",
+  "authors": ["artginzburg"],
+  "contact": {
+    "homepage": "https://modrinth.com/mod/insomnia-notifier",
+    "sources": "https://github.com/artginzburg/insomnia-notifier",
+    "issues": "https://github.com/artginzburg/insomnia-notifier/issues"
+  },
+  "license": "CC0-1.0",
+  "icon": "assets/insomnia-notifier/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "main": ["art.ginzburg.insomnianotifier.InsomniaNotifier"],
+    "client": ["art.ginzburg.insomnianotifier.InsomniaNotifierClient"]
+  },
+  "mixins": [
+    {
+      "config": "insomnia-notifier.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.13",
+    "minecraft": "~1.21.3",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
 }
