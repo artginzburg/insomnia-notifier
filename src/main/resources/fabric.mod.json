@@ -10,7 +10,7 @@
     "sources": "https://github.com/artginzburg/insomnia-notifier",
     "issues": "https://github.com/artginzburg/insomnia-notifier/issues"
   },
-  "license": "CC0-1.0",
+  "license": "MIT",
   "icon": "assets/insomnia-notifier/icon.png",
   "environment": "client",
   "entrypoints": {
