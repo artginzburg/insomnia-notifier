@@ -5,6 +5,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import art.ginzburg.insomnianotifier.effects.MobEffectManager;
 import art.ginzburg.insomnianotifier.effects.ModEffects;
 import art.ginzburg.insomnianotifier.state.FileBackedSleepTracker;
 import art.ginzburg.insomnianotifier.state.SleepTrackerManager;
@@ -14,7 +15,6 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.stats.Stats;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
 
 @Mixin(Player.class)
@@ -23,11 +23,7 @@ public class PlayerMixin {
 
   private boolean wasDead = false;
 
-  private boolean hasAddedInsomniaEffect = false;
-  private boolean hasRemovedInsomniaEffect = false;
-
-  private boolean hasAddedPhantomSpawningEffect = false;
-  private boolean hasRemovedPhantomSpawningEffect = false;
+  private final MobEffectManager effectManager = new MobEffectManager();
 
   private static Minecraft client = null;
 
@@ -75,37 +71,8 @@ public class PlayerMixin {
 
     boolean phantomsCanSpawn = shouldHaveInsomniaEffect && canSpawnPhantoms(player);
 
-    if (shouldHaveInsomniaEffect && !phantomsCanSpawn) {
-      if (!hasAddedInsomniaEffect) {
-        MobEffectInstance effectInstance = new MobEffectInstance(ModEffects.INSOMNIA,
-            -1, 0, true, true);
-        player.addEffect(effectInstance);
-        hasAddedInsomniaEffect = true;
-        hasRemovedInsomniaEffect = false;
-      }
-    } else {
-      if (!hasRemovedInsomniaEffect) {
-        player.removeEffect(ModEffects.INSOMNIA);
-        hasAddedInsomniaEffect = false;
-        hasRemovedInsomniaEffect = true;
-      }
-    }
-
-    if (phantomsCanSpawn) {
-      if (!hasAddedPhantomSpawningEffect) {
-        MobEffectInstance effectInstance = new MobEffectInstance(ModEffects.PHANTOM_SPAWNING,
-            -1, 0, true, true);
-        player.addEffect(effectInstance);
-        hasAddedPhantomSpawningEffect = true;
-        hasRemovedPhantomSpawningEffect = false;
-      }
-    } else {
-      if (!hasRemovedPhantomSpawningEffect) {
-        player.removeEffect(ModEffects.PHANTOM_SPAWNING);
-        hasAddedPhantomSpawningEffect = false;
-        hasRemovedPhantomSpawningEffect = true;
-      }
-    }
+    effectManager.updateEffect(player, ModEffects.INSOMNIA, 0, shouldHaveInsomniaEffect && !phantomsCanSpawn);
+    effectManager.updateEffect(player, ModEffects.PHANTOM_SPAWNING, 1, phantomsCanSpawn);
   }
 
   private boolean canSpawnPhantoms(LocalPlayer player) {
