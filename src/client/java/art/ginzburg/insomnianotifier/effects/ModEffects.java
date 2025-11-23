@@ -9,10 +9,14 @@ import net.minecraft.resources.ResourceLocation;
 
 public class ModEffects {
   private static final MobEffect INSOMNIA_EFFECT = new InsomniaEffect();
+  private static final MobEffect PHANTOM_SPAWNING_EFFECT = new PhantomSpawningEffect();
+
   public static Holder<MobEffect> INSOMNIA = null;
+  public static Holder<MobEffect> PHANTOM_SPAWNING = null;
 
   public static void registerEffects() {
     INSOMNIA = register("insomnia", INSOMNIA_EFFECT);
+    PHANTOM_SPAWNING = register("phantom_spawning", PHANTOM_SPAWNING_EFFECT);
   }
 
   private static Holder<MobEffect> register(String id, MobEffect statusEffect) {

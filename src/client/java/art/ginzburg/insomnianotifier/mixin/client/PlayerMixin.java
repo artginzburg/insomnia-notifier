@@ -10,8 +10,9 @@ import art.ginzburg.insomnianotifier.state.FileBackedSleepTracker;
 import art.ginzburg.insomnianotifier.state.SleepTrackerManager;
 import art.ginzburg.insomnianotifier.util.WorldIdUtil;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
-
+import net.minecraft.core.BlockPos;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
@@ -22,8 +23,11 @@ public class PlayerMixin {
 
   private boolean wasDead = false;
 
-  private boolean hasAddedEffect = false;
-  private boolean hasRemovedEffect = false;
+  private boolean hasAddedInsomniaEffect = false;
+  private boolean hasRemovedInsomniaEffect = false;
+
+  private boolean hasAddedPhantomSpawningEffect = false;
+  private boolean hasRemovedPhantomSpawningEffect = false;
 
   private static Minecraft client = null;
 
@@ -69,22 +73,52 @@ public class PlayerMixin {
     boolean shouldHaveInsomniaEffect = tracker.getTimeSinceRest() >= ticksUntilPhantoms
         && player.clientLevel.dimensionType().bedWorks();
 
-    if (shouldHaveInsomniaEffect) {
-      if (!hasAddedEffect) {
+    boolean phantomsCanSpawn = shouldHaveInsomniaEffect && canSpawnPhantoms(player);
+
+    if (shouldHaveInsomniaEffect && !phantomsCanSpawn) {
+      if (!hasAddedInsomniaEffect) {
         MobEffectInstance effectInstance = new MobEffectInstance(ModEffects.INSOMNIA,
             -1, 0, true, true);
         player.addEffect(effectInstance);
-        hasAddedEffect = true;
-        hasRemovedEffect = false;
+        hasAddedInsomniaEffect = true;
+        hasRemovedInsomniaEffect = false;
       }
     } else {
-      if (!hasRemovedEffect) {
+      if (!hasRemovedInsomniaEffect) {
         player.removeEffect(ModEffects.INSOMNIA);
-        hasAddedEffect = false;
-        hasRemovedEffect = true;
+        hasAddedInsomniaEffect = false;
+        hasRemovedInsomniaEffect = true;
       }
     }
 
+    if (phantomsCanSpawn) {
+      if (!hasAddedPhantomSpawningEffect) {
+        MobEffectInstance effectInstance = new MobEffectInstance(ModEffects.PHANTOM_SPAWNING,
+            -1, 0, true, true);
+        player.addEffect(effectInstance);
+        hasAddedPhantomSpawningEffect = true;
+        hasRemovedPhantomSpawningEffect = false;
+      }
+    } else {
+      if (!hasRemovedPhantomSpawningEffect) {
+        player.removeEffect(ModEffects.PHANTOM_SPAWNING);
+        hasAddedPhantomSpawningEffect = false;
+        hasRemovedPhantomSpawningEffect = true;
+      }
+    }
+  }
+
+  private boolean canSpawnPhantoms(LocalPlayer player) {
+    BlockPos playerPos = player.blockPosition();
+    ClientLevel clientLevel = player.clientLevel;
+
+    if (playerPos.getY() < clientLevel.getSeaLevel())
+      return false;
+
+    if (!clientLevel.canSeeSky(playerPos))
+      return false;
+
+    return clientLevel.isNight() || clientLevel.isThundering();
   }
 
 }
