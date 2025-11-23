@@ -15,22 +15,23 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.stats.Stats;
-import net.minecraft.world.entity.player.Player;
 
-@Mixin(Player.class)
+@Mixin(LocalPlayer.class)
 public class PlayerMixin {
   private static int ticksUntilPhantoms = 72000;
 
   private boolean wasDead = false;
 
-  private final MobEffectManager effectManager = new MobEffectManager();
+  private final MobEffectManager effectManager = new MobEffectManager(getThis(), ModEffects.INSOMNIA);
+
+  private String worldId = null;
+  private FileBackedSleepTracker tracker = null;
 
   private static Minecraft client = null;
 
   @Inject(method = "tick", at = @At("TAIL"))
   private void onTick(CallbackInfo ci) {
-    if (!(((Object) this instanceof LocalPlayer player)))
-      return;
+    LocalPlayer player = getThis();
     if (!player.clientLevel.isClientSide)
       return;
 
@@ -39,11 +40,9 @@ public class PlayerMixin {
       return;
     }
 
-    String worldId = WorldIdUtil.getWorldId(client);
-    FileBackedSleepTracker tracker = SleepTrackerManager.get(worldId);
-    if (tracker == null) {
+    tracker = initializeTracker();
+    if (tracker == null)
       return;
-    }
 
     boolean isDeadOrDying = player.isDeadOrDying();
     if (isDeadOrDying && !wasDead) {
@@ -71,8 +70,8 @@ public class PlayerMixin {
 
     boolean phantomsCanSpawn = shouldHaveInsomniaEffect && canSpawnPhantoms(player);
 
-    effectManager.updateEffect(player, ModEffects.INSOMNIA, 0, shouldHaveInsomniaEffect && !phantomsCanSpawn);
-    effectManager.updateEffect(player, ModEffects.PHANTOM_SPAWNING, 1, phantomsCanSpawn);
+    effectManager.updateEffect(0, false, shouldHaveInsomniaEffect && !phantomsCanSpawn);
+    effectManager.updateEffect(1, true, phantomsCanSpawn);
   }
 
   private boolean canSpawnPhantoms(LocalPlayer player) {
@@ -88,4 +87,19 @@ public class PlayerMixin {
     return clientLevel.isNight() || clientLevel.isThundering();
   }
 
+  private FileBackedSleepTracker initializeTracker() {
+    if (worldId == null) {
+      worldId = WorldIdUtil.getWorldId(client);
+    }
+
+    if (tracker == null) {
+      tracker = SleepTrackerManager.get(worldId);
+    }
+
+    return tracker;
+  }
+
+  private LocalPlayer getThis() {
+    return (LocalPlayer) (Object) this;
+  }
 }

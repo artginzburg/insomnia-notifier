@@ -1,31 +1,41 @@
 package art.ginzburg.insomnianotifier.effects;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Holder;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.player.Player;
 
 public class MobEffectManager {
-  private final Map<Holder<MobEffect>, Boolean> trackedEffects = new HashMap<>();
+  private final LocalPlayer player;
+  private final Holder<MobEffect> effect;
+
+  private EffectKey currentEffect = null;
+
+  public MobEffectManager(LocalPlayer player, Holder<MobEffect> effect) {
+    this.player = player;
+    this.effect = effect;
+  }
 
   /**
-   * Updates a mob effect on the player based on a condition.
-   * Adds the effect if the condition is true and it hasn't been added yet.
-   * Removes the effect if the condition is false and it was previously added.
+   * Updates the effect on the player based on a condition.
+   * Only one variant of the effect can be active at a time.
    */
-  public void updateEffect(Player player, Holder<MobEffect> effect, int amplifier, boolean shouldHave) {
-    boolean hasEffect = trackedEffects.getOrDefault(effect, false);
+  public void updateEffect(int amplifier, boolean ambient, boolean shouldHave) {
+    EffectKey key = new EffectKey(amplifier, ambient);
 
-    if (shouldHave && !hasEffect) {
-      MobEffectInstance effectInstance = new MobEffectInstance(effect, -1, amplifier);
-      player.addEffect(effectInstance);
-      trackedEffects.put(effect, true);
-    } else if (!shouldHave && hasEffect) {
+    if (shouldHave && !key.equals(currentEffect)) {
       player.removeEffect(effect);
-      trackedEffects.put(effect, false);
+      player.addEffect(new MobEffectInstance(effect, -1, amplifier, ambient, true));
+      // System.out.println("Added effect: " + effect + " amplifier=" + amplifier + "
+      // ambient=" + ambient);
+      currentEffect = key;
+    } else if (!shouldHave && key.equals(currentEffect)) {
+      player.removeEffect(effect);
+      // System.out.println("Removed effect: " + effect);
+      currentEffect = null;
     }
+  }
+
+  private record EffectKey(int amplifier, boolean ambient) {
   }
 }
