@@ -26,12 +26,9 @@ public class MobEffectManager {
     if (shouldHave && !key.equals(currentEffect)) {
       player.removeEffect(effect);
       player.addEffect(new MobEffectInstance(effect, -1, amplifier, ambient, true));
-      // System.out.println("Added effect: " + effect + " amplifier=" + amplifier + "
-      // ambient=" + ambient);
       currentEffect = key;
     } else if (!shouldHave && key.equals(currentEffect)) {
       player.removeEffect(effect);
-      // System.out.println("Removed effect: " + effect);
       currentEffect = null;
     }
   }
